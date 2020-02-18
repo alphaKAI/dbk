@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/dbk
+dbk.so
+dbk.dylib
+dbk.dll
+dbk.a
+dbk.lib
+dbk-test-*
+*.exe
+*.o
+*.obj
+*.lst

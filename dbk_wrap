@@ -1,0 +1,7 @@
+local cmd=$1
+
+case "$cmd" in
+  "add" | "get" | "list") $DBK_IMPL_PATH $@ ;;
+  "goto" ) cd $($DBK_IMPL_PATH $@) ;;
+  * ) $DBK_IMPL_PATH $@ ;;
+esac
