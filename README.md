@@ -17,6 +17,9 @@ DBK_IMPL_PATH=/path/to/generated/dbk/binary
 alias dbk="source /path/to/directory/of/dbk/dbk_wrap"
 ```
 
+More useful:
+`alias dbkcd='cd $(echo $(dbk peco|peco) | ruby -e "puts STDIN.gets.chomp.split(\" - \")[1]")'`
+
 ## LICENSE
 DBK is released under the MIT License.  
 Please see `LICENSE` for details.  

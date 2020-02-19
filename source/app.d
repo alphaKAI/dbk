@@ -1,16 +1,17 @@
-import std.stdio,
-       std.process,
-       std.typecons,
-       std.file,
-       std.path,
-       std.json,
-       std.format,
-       std.algorithm,
-       std.array,
-       std.exception;
+import std.stdio, std.process, std.typecons, std.file, std.path, std.json,
+  std.format, std.algorithm, std.array, std.exception;
 
-class UnimplementedException : Exception { this (string msg) { super(msg); } }
-class DBKException : Exception { this (string msg) { super(msg); } }
+class UnimplementedException : Exception {
+  this(string msg) {
+    super(msg);
+  }
+}
+
+class DBKException : Exception {
+  this(string msg) {
+    super(msg);
+  }
+}
 
 class Env {
   string home;
@@ -26,7 +27,7 @@ class BookmarkEntry {
   string name;
   string path;
 
-  this (string name, string path) {
+  this(string name, string path) {
     this.name = name;
     this.path = path;
   }
@@ -102,7 +103,8 @@ Nullable!BookmarkEntry getBookmarkEntry(Env env, string name) {
 void add(Env env, Nullable!string optName, Nullable!string optPath) {
   string pwd = getcwd;
   string name = optName.isNull ? pwd.baseName : optName.get;
-  string path = optPath.isNull ? pwd : optPath.get.expandTilde.absolutePath(pwd).buildNormalizedPath;
+  string path = optPath.isNull ? pwd : optPath.get.expandTilde.absolutePath(pwd)
+    .buildNormalizedPath;
 
   if (existsBookmarkEntry(env, name)) {
     writefln("Error - Bookmark entry \"%s\" is already exists, please consider renaming", name);
@@ -151,7 +153,9 @@ void rm(Env env, string name) {
     jv["bookmarks"].array = [];
 
     foreach (bookmark; bookmarks) {
-      if (bookmark.name == name) { continue; }
+      if (bookmark.name == name) {
+        continue;
+      }
       JSONValue jentry;
       jentry["name"] = bookmark.name;
       jentry["path"] = bookmark.path;
@@ -162,14 +166,25 @@ void rm(Env env, string name) {
   }
 }
 
-void truncArg(ref string[] args) { args = args[1..$]; }
+void peco(Env env) {
+  BookmarkEntry[] bookmarks = getAllBookmarks(env);
+
+  foreach (bookmark; bookmarks) {
+    writefln("%s - %s", bookmark.name, bookmark.path);
+  }
+}
+
+void truncArg(ref string[] args) {
+  args = args[1 .. $];
+}
 
 enum Command {
   Add = "add",
   List = "list",
   Get = "get",
   Goto = "goto",
-  Rm = "rm"
+  Rm = "rm",
+  Peco = "peco"
 }
 
 void help() {
@@ -189,33 +204,41 @@ void main(string[] args) {
 
   if (args.length) {
     switch (args[0]) with (Command) {
-      case Add:
-        args.truncArg;
-        add(env,
-            args.length      ? nullable(args[0]) : Nullable!string.init,
-            args.length == 2 ? nullable(args[1]) : Nullable!string.init);
-        break;
-      case List:
-        list(env);
-        break;
-      case Get:
-        if (args.length < 2) { throw new DBKException("%s command error : Arguments required".format(args[0])); }
-        args.truncArg;
-        get(env, args[0]);
-        break;
-      case Goto:
-        if (args.length < 2) { throw new DBKException("%s command error : Arguments required".format(args[0])); }
-        args.truncArg;
-        get(env, args[0]);
-        break;
-      case Rm:
-        if (args.length < 2) { throw new DBKException("%s command error : Arguments required".format(args[0])); }
-        args.truncArg;
-        rm(env, args[0]);
-        break;
-      default:
-        help();
-        break;
+    case Add:
+      args.truncArg;
+      add(env, args.length ? nullable(args[0]) : Nullable!string.init,
+          args.length == 2 ? nullable(args[1]) : Nullable!string.init);
+      break;
+    case List:
+      list(env);
+      break;
+    case Get:
+      if (args.length < 2) {
+        throw new DBKException("%s command error : Arguments required".format(args[0]));
+      }
+      args.truncArg;
+      get(env, args[0]);
+      break;
+    case Goto:
+      if (args.length < 2) {
+        throw new DBKException("%s command error : Arguments required".format(args[0]));
+      }
+      args.truncArg;
+      get(env, args[0]);
+      break;
+    case Rm:
+      if (args.length < 2) {
+        throw new DBKException("%s command error : Arguments required".format(args[0]));
+      }
+      args.truncArg;
+      rm(env, args[0]);
+      break;
+    case Peco:
+      peco(env);
+      break;
+    default:
+      help();
+      break;
     }
   } else {
     help();
